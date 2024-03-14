@@ -5,6 +5,7 @@ from View.homeScreen import start_home_screen
 
 
 
+
 # Create the main window
 root = tk.Tk()
 root.title("DXF ANALYZER")
