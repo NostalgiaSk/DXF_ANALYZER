@@ -1,55 +1,102 @@
-import tkinter as tk
-from tkinter import ttk
-from Constants.frameConstants import HIGH, WIDTH
-from View.homeScreen import start_home_screen
+from tkinter import Tk, Canvas, PhotoImage
+from tkinter.ttk import Progressbar, Style
+from pathlib import Path
+from View.homeScreen import create_home_window
+def relative_to_assets(path: str) -> Path:
+    return ASSETS_PATH / path
 
+window = Tk()
+window.geometry("850x450")
+window.configure(bg="#FFFFFF")
 
+canvas = Canvas(
+    window,
+    bg="#FFFFFF",
+    height=450,
+    width=850,
+    bd=0,
+    highlightthickness=0,
+    relief="ridge"
+)
+canvas.place(x=0, y=0)
 
+canvas.create_rectangle(
+    0.0,
+    0.0,
+    850.0,
+    162.0,
+    fill="#020088",
+    outline=""
+)
 
-# Create the main window
-root = tk.Tk()
-root.title("DXF ANALYZER")
+# Create "DXF ANALYZER" text
+canvas.create_text(
+    324.0,
+    102.0,
+    anchor="nw",
+    text="DXF ANALYZER",
+    fill="#FFFFFF",
+    font=("Lemonada Bold", 24, "bold")
+)
 
-# Frame 1 : creation & label
-frame1 = tk.Frame(root)
-frame1.pack(padx=WIDTH, pady=HIGH)
-label1 = tk.Label(frame1, text="DXF ANALYZER", font=("Trebuchet MS", 15, "bold"))
-label1.pack(pady=(20, 10)) 
+# Load and display the image
+image_img1 = PhotoImage(file="images/dxf.png")
+resized_img1 = image_img1.subsample(6, 6)  # adjust subsampling factor as needed
+text_coords = canvas.bbox(canvas.find_all()[1])  # Assuming it's the second item on the canvas
+img_x = (text_coords[0] + text_coords[2]) / 2  # Centering horizontally
+img_y = text_coords[1] - 50  # 50 pixels above the text
+img1 = canvas.create_image(
+    img_x,
+    img_y,
+    anchor="center",
+    image=resized_img1
+)
 
+# Create loading label
+loading_label = canvas.create_text(
+    372.0,
+    240.0,
+    anchor="nw",
+    text="Chargement...",
+    fill="#020088",
+    font=("Trebuchet MS", 12, "bold")
+)
 
+# Custom progress bar style
+style = Style()
+style.theme_use("default")
+style.configure("Custom.Horizontal.TProgressbar", foreground="#FFFFFF", background="#030088")
 
-# Create a loading progress bar 
-loading_label = tk.Label(frame1, text="Chargement...", font=("Trebuchet MS", 12, "bold"))
-loading_label.pack(pady=10)
-progress = ttk.Progressbar(frame1, orient="horizontal", length=200, mode="determinate", style="Striped.Horizontal.TProgressbar")
-progress.pack(pady=10)  
+# Create progress bar
+progress = Progressbar(
+    window,
+    orient="horizontal",
+    length=220,
+    mode="determinate",
+    style="Custom.Horizontal.TProgressbar"
+)
+progress.place(x=325, y=295)
 
 # Loading logic
+i = 0
 def load():
-    global i 
+    global i
     if i <= 10:
         txt = 'Chargement...' + (str(10*i)+'%')
-        loading_label.config(text=txt)
+        canvas.itemconfigure(loading_label, text=txt)
         progress['value'] = 10*i
         i += 1
-        loading_label.after(400, load)
+        window.after(200, load)
     else:
         switch_frame()
 
-
 def switch_frame():
-    loading_label.pack_forget()  
-    progress.pack_forget()
-    frame1.destroy()    
-    start_home_screen(frame2)
+    canvas.delete(loading_label)
+    window.destroy()
+    create_home_window()   
+   
 
-
-
-frame2 = tk.Frame(root)
-frame2.pack_forget()
-frame2.pack(padx=WIDTH, pady=HIGH)
-i = 0
+# Start the loading
 load()
 
-root.resizable(False,False)
-root.mainloop()
+window.mainloop()
