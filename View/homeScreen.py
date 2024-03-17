@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog
+from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
 import ezdxf  
 import math
 
@@ -139,6 +139,19 @@ def create_home_window():
         width=176.0,
         height=34.0
     )
+
+
+    text_label = Label(window, text="Choisir l'épaisseur désiré", bg="#FFFFFF")
+    text_label.place(x=420, y=450)
+
+    dropdown_var = StringVar()
+    dropdown = ttk.Combobox(window, textvariable=dropdown_var, values=[1, 2, 3, 4, 5], state="readonly")
+    dropdown.current(0)  # Set default value to 1
+    dropdown.place(      
+        x=400,
+        y=470,
+        width=200,
+        height=34.0)
 
     def calculate_perimeter(entity):
         if entity.dxftype() == 'LINE':
