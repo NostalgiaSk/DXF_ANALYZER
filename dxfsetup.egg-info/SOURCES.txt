@@ -1,0 +1,10 @@
+setup.py
+Database/__init__.py
+Database/files_database.py
+Entities/__init__.py
+Entities/file.py
+Entities/thickness.py
+dxfsetup.egg-info/PKG-INFO
+dxfsetup.egg-info/SOURCES.txt
+dxfsetup.egg-info/dependency_links.txt
+dxfsetup.egg-info/top_level.txt
