@@ -6,16 +6,21 @@ conn = sqlite3.connect('files.db')
 cursor = conn.cursor()
 
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS files
-                  (id INTEGER PRIMARY KEY ,
-                   file_name TEXT,
-                   perimeter REAL,
-                   thickness REAL)''')
+def create_tables(cursor):
+    cursor.execute('''CREATE TABLE IF NOT EXISTS files
+                      (id INTEGER PRIMARY KEY ,
+                       file_name TEXT,
+                       perimeter REAL,
+                       thickness REAL)''')
 
+    cursor.execute('''CREATE TABLE IF NOT EXISTS thicknesses
+                      (id INTEGER PRIMARY KEY ,
+                       thickness REAL)''')
+    
+                   
+# for value in range(1, 6):
+#     cursor.execute("INSERT INTO thicknesses (thickness) VALUES (?)", (value,))
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS thicknesses
-                  (id INTEGER PRIMARY KEY ,
-                   thickness REAL)''')
 
 conn.commit()
 
@@ -26,10 +31,10 @@ def insert_into_files_table(file : File):
         c.execute("INSERT INTO files VALUES  (:name, :perimeter)" , {'name' : file.file_name , 'perimeter' :file.perimeter})
         
 
-def get_thickness_values():
+def get_thickness_values(cursor):
     cursor.execute("SELECT thickness FROM thicknesses")
     thickness_values = cursor.fetchall()
-    return [thickness[0] for thickness in thickness_values]
+    return thickness_values
 
 
 conn.close()

@@ -1,9 +1,15 @@
 from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
 import ezdxf  
 import math
+from Database.files_database import get_thickness_values
+import sqlite3
+
 
 def create_home_window():
     window = Tk()
+    conn = sqlite3.connect('files.db')
+    cursor = conn.cursor()
+    thickness_values = get_thickness_values(cursor)
 
     window.geometry("1000x600")
     window.configure(bg="#FFFFFF")
@@ -145,7 +151,7 @@ def create_home_window():
     text_label.place(x=420, y=450)
 
     dropdown_var = StringVar()
-    dropdown = ttk.Combobox(window, textvariable=dropdown_var, values=[1, 2, 3, 4, 5], state="readonly")
+    dropdown = ttk.Combobox(window, textvariable=dropdown_var, values=thickness_values, state="readonly")
     dropdown.current(0)  # Set default value to 1
     dropdown.place(      
         x=400,
@@ -194,4 +200,8 @@ def create_home_window():
 
     window.resizable(False, False)
     window.mainloop()
+
+
+
+
 

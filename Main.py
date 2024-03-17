@@ -2,6 +2,10 @@ from tkinter import Tk, Canvas, PhotoImage
 from tkinter.ttk import Progressbar, Style
 from pathlib import Path
 from View.homeScreen import create_home_window
+import sqlite3
+from Database.files_database import create_tables
+
+
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / path
 
@@ -98,5 +102,10 @@ def switch_frame():
 
 # Start the loading
 load()
+#init database tables
+conn = sqlite3.connect('files.db')
+cursor = conn.cursor()
+create_tables(cursor)
+conn.close()
 
 window.mainloop()
