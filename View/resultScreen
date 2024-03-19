@@ -1,0 +1,108 @@
+from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
+import ezdxf  
+import math
+from Database.files_database import get_thickness_values
+import sqlite3
+
+
+def create_result_window():
+    window = Tk()
+
+
+    window.geometry("1000x600")
+    window.configure(bg="#FFFFFF")
+
+    canvas = Canvas(
+        window,
+        bg="#FFFFFF",
+        height=600,
+        width=1000,
+        bd=0,
+        highlightthickness=0,
+        relief="ridge"
+    )
+
+    canvas.place(x=0, y=0)
+    canvas.create_rectangle(
+        0.0,
+        0.0,
+        1000.0,
+        66.0,
+        fill="#020088",
+        outline=""
+    )
+
+    canvas.create_text(
+        61.0,
+        19.0,
+        anchor="nw",
+        text="DXF ANALYZER",
+        fill="#FFFFFF",
+        font=("Lemonada Bold", 16 * -1)
+    )
+
+    text_label = Label(window, text="Resultat", bg="#FFFFFF", font=("Arial", 14, "bold"), fg="#030088")
+    text_label.place(x=470, y=120)
+
+    # Add the table
+    table = ttk.Treeview(window)
+    table["columns"] = ("Fichier", "Perimeter", "Vitesse")
+    table.column("#0", width=0, stretch=False)
+    table.column("Fichier", anchor="w", width=300)
+    table.column("Perimeter", anchor="center", width=200)
+    table.column("Vitesse", anchor="center", width=200)
+    table.heading("#0", text="", anchor="w")
+    table.heading("Fichier", text="Filename", anchor="center")
+    table.heading("Perimeter", text="Perimeter", anchor="center")
+    table.heading("Vitesse", text="Vitesse", anchor="center")
+    table.place(x=150, y=200)
+
+    image_image_1 = PhotoImage(file="View/assets/home_assets/image_1.png")
+    image_1 = canvas.create_image(
+        33.0,
+        33.0,
+        image=image_image_1
+    )
+
+
+    button_image_3 = PhotoImage(file="View/assets/result_assets/button_1.png")
+    button_3 = Button(
+        image=button_image_3,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: print("print button  clicked"),
+        relief="flat"
+    )
+    button_3.place(
+        x=370.0,
+        y=500.0,
+        width=274,
+        height=40.0
+    )
+
+    button_image_4 = PhotoImage(file="View/assets/home_assets/button_4.png")
+    button_4 = Button(
+        image=button_image_4,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: print("button_4 clicked"),
+        relief="flat"
+    )
+    button_4.place(
+        x=794.0,
+        y=17.0,
+        width=176.0,
+        height=34.0
+    )
+
+
+
+    window.resizable(False, False)
+    window.mainloop()
+
+
+
+
+
+
+create_result_window()
