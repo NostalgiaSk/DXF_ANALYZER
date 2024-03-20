@@ -1,8 +1,10 @@
 from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
 import ezdxf  
 import math
-from Database.files_database import get_thickness_values
+from Database.files_database import get_thickness_values , insert_into_files_table,update_thickness_in_database,delete_all_files
 import sqlite3
+from tkinter.messagebox import showwarning
+from Entities.file import File
 
 
 def create_home_window():
@@ -72,20 +74,24 @@ def create_home_window():
                     msp = doc.modelspace()
                     total_perimeter = 0
                     entity_count = 0
+                    file_content = b""
                     for entity in msp:
                         perimeter = calculate_perimeter(entity)
                         total_perimeter += perimeter
                         entity_count += 1
+                        entity_info = f"Entity Type: {entity.dxftype()}, Perimeter: {perimeter:.2f}\n"
+                        file_content += entity_info.encode('utf-8')
                         print(f"Entity {entity_count} Type = {entity.dxftype()}: Perimeter = {perimeter:.2f}")
                     print(f"Total perimeter of {entity_count} entities: {total_perimeter:.2f}")
                     filename = filepath.split("/")[-1]
-                    table.insert("", "end", values=(filename, f"{total_perimeter:.2f}"))  # Changed total_perimeter to string format
+                    save_file(conn,cursor, filename, total_perimeter, file_content)
+                    table.insert("", "end", values=(filename, f"{total_perimeter:.2f}")) 
                 except IOError:
                     print("Not a DXF file or a generic I/O error.")
                 except ezdxf.DXFStructureError:
                     print("Invalid or corrupted DXF file.")
         except Exception as e:
-            print("An error occurred:", e)
+            print("An error occurred 1:", e)
 
     button_1 = Button(
         image=button_image_1,
@@ -106,7 +112,7 @@ def create_home_window():
         image=button_image_2,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: reset_table(table),
+        command=lambda: reset_table(table,cursor,conn),
         relief="flat"
     )
     button_2.place(
@@ -121,7 +127,7 @@ def create_home_window():
         image=button_image_3,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: print("button_3 clicked"),
+        command=lambda:save_data_and_navigate_to_result(conn,table, cursor),
         relief="flat"
     )
     button_3.place(
@@ -195,8 +201,31 @@ def create_home_window():
         else:
             return 0
 
-    def reset_table(table):
+    def reset_table(table ,cursor,conn):
         table.delete(*table.get_children()) 
+        delete_all_files(cursor)
+
+    def save_data_and_navigate_to_result(conn,table,cursor):
+        if not table.get_children():
+            showwarning("Empty Table", "The table is empty!")
+            return
+        try:
+            new_thickness = float(dropdown.get())
+        except ValueError:
+            showwarning("Invalid Value", "Please select a valid thickness.")
+        return
+        update_thickness_in_database(cursor, new_thickness)
+        conn.commit()
+    
+    def save_file(conn,cursor ,filename, perimeter, file_content):
+        thickness = float(dropdown.get())
+        file = File(filename,file_content, perimeter, thickness)
+        try:
+            insert_into_files_table(file, cursor,conn)
+            conn.commit()
+        except Exception as e:
+            print("An error occurred2:", e)
+        conn.commit()
 
     window.resizable(False, False)
     window.mainloop()

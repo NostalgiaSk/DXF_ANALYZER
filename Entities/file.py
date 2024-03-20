@@ -1,9 +1,9 @@
-
 class File:
-    def __init__(self, file_name, perimeter ,thickness):
-        self.file_name = file_name
-        self.perimeter = perimeter
-        self.thickness = thickness
+    def __init__(self, file_name, file_content, perimeter, thickness):
+        self._file_name = file_name
+        self._file_content = file_content
+        self._perimeter = perimeter
+        self._thickness = thickness
         
     @property
     def file_name(self):
@@ -12,6 +12,14 @@ class File:
     @file_name.setter
     def file_name(self, value):
         self._file_name = value
+
+    @property
+    def file_content(self):
+        return self._file_content
+    
+    @file_content.setter
+    def file_content(self, value):
+        self._file_content = value
     
     @property
     def perimeter(self):

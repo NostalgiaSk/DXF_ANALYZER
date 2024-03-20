@@ -3,7 +3,7 @@ from tkinter.ttk import Progressbar, Style
 from pathlib import Path
 from View.homeScreen import create_home_window
 import sqlite3
-from Database.files_database import create_tables
+from Database.files_database import create_tables ,init_databases
 
 
 def relative_to_assets(path: str) -> Path:
@@ -105,7 +105,8 @@ load()
 #init database tables
 conn = sqlite3.connect('files.db')
 cursor = conn.cursor()
+init_databases(conn,cursor)
 create_tables(cursor)
-conn.close()
+
 
 window.mainloop()
