@@ -23,28 +23,40 @@ def create_tables(cursor):
 
 
 
-def init_databases(conn,cursor):
-    cursor.execute("DELETE FROM files")
-    cursor.execute("DELETE FROM thicknesses")
-    thickness_speed_values = [
-    (1, 10),  
-    (2, 20),  
-    (3, 30),  
-    (4, 40),  
-    (5, 50) 
-    ]
-    for thickness, speed in thickness_speed_values:
-          cursor.execute("INSERT INTO thicknesses (thickness, speed) VALUES (?, ?)", (thickness, speed))
-    conn.commit()
+def init_databases(conn, cursor):
+    try:
+        cursor.execute("DELETE FROM files")
+        cursor.execute("DELETE FROM thicknesses")
+        
+        thickness_speed_values = [
+            (1, 10),  
+            (2, 20),  
+            (3, 30),  
+            (4, 40),  
+            (5, 50) 
+        ]
+        
+        for thickness, speed in thickness_speed_values:
+            print(thickness, speed)
+            cursor.execute("INSERT INTO thicknesses (thickness, speed) VALUES (?, ?)", (thickness, speed))
+        
+        conn.commit()
+        print("Initialization successful.")
+    except Exception as e:
+        print("An error occurred during initialization:", e)
+        conn.rollback()  # Rollback changes if an error occurs
+
+    
       
 
 
 #FILES TABLE MANIPULATION
-def update_thickness_in_database(cursor, new_thickness,conn):
+def update_thickness_in_database(cursor, new_thickness,new_speed,conn):
     try:
         cursor.execute("UPDATE files SET thickness = ?", (new_thickness,))
+        cursor.execute("UPDATE files SET speed = ?", (new_speed,))
         conn.commit()
-        print("Thickness updated successfully.")
+        print("Thickness and speed updated successfully.")
     except sqlite3.Error as e:
         print("An error occurred while updating thickness:", e)
 

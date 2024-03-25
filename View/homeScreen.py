@@ -216,7 +216,8 @@ def create_home_window():
         except ValueError:
             showwarning("Invalid Value", "Please select a valid thickness.")
             return
-        update_thickness_in_database(cursor, new_thickness,conn)
+        cutting_speed = fetch_cuuting_speed(cursor,new_thickness)
+        update_thickness_in_database(cursor, new_thickness,cutting_speed,conn)
         conn.commit()
         window.destroy()
         create_result_window() 
@@ -224,6 +225,7 @@ def create_home_window():
     def save_file(conn,cursor ,filename, perimeter, file_content):
         thickness = float(dropdown.get())
         cutting_speed = fetch_cuuting_speed(cursor,thickness)
+        print("cuttting speed issss {cutting_speed}")
         file = File(filename,file_content, perimeter, thickness,cutting_speed)
         try:
             insert_into_files_table(file, cursor,conn)
