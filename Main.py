@@ -105,8 +105,12 @@ load()
 #init database tables
 conn = sqlite3.connect('files.db')
 cursor = conn.cursor()
-init_databases(conn,cursor)
+cursor.execute("DROP TABLE IF EXISTS  thicknesses")
+cursor.execute("DROP TABLE IF EXISTS  files")
 create_tables(cursor)
+init_databases(conn,cursor)
+
+
 
 
 window.mainloop()

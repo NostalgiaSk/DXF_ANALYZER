@@ -1,10 +1,11 @@
 from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
 import ezdxf  
 import math
-from Database.files_database import get_thickness_values , insert_into_files_table,update_thickness_in_database,delete_all_files
+from Database.files_database import get_thickness_values , insert_into_files_table,update_thickness_in_database,delete_all_files,fetch_cuuting_speed
 import sqlite3
 from tkinter.messagebox import showwarning
 from Entities.file import File
+from View.resultScreen import create_result_window
 
 
 def create_home_window():
@@ -203,7 +204,8 @@ def create_home_window():
 
     def reset_table(table ,cursor,conn):
         table.delete(*table.get_children()) 
-        delete_all_files(cursor)
+        delete_all_files(cursor,conn)
+        conn.close()
 
     def save_data_and_navigate_to_result(conn,table,cursor):
         if not table.get_children():
@@ -213,13 +215,16 @@ def create_home_window():
             new_thickness = float(dropdown.get())
         except ValueError:
             showwarning("Invalid Value", "Please select a valid thickness.")
-        return
-        update_thickness_in_database(cursor, new_thickness)
+            return
+        update_thickness_in_database(cursor, new_thickness,conn)
         conn.commit()
+        window.destroy()
+        create_result_window() 
     
     def save_file(conn,cursor ,filename, perimeter, file_content):
         thickness = float(dropdown.get())
-        file = File(filename,file_content, perimeter, thickness)
+        cutting_speed = fetch_cuuting_speed(cursor,thickness)
+        file = File(filename,file_content, perimeter, thickness,cutting_speed)
         try:
             insert_into_files_table(file, cursor,conn)
             conn.commit()

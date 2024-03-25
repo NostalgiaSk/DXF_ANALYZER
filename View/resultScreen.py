@@ -1,13 +1,14 @@
 from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
 import ezdxf  
 import math
-from Database.files_database import get_thickness_values
+from Database.files_database import get_file_data
 import sqlite3
 
 
 def create_result_window():
     window = Tk()
-
+    conn = sqlite3.connect('files.db')
+    cursor = conn.cursor()
 
     window.geometry("1000x600")
     window.configure(bg="#FFFFFF")
@@ -46,16 +47,20 @@ def create_result_window():
 
     # Add the table
     table = ttk.Treeview(window)
-    table["columns"] = ("Fichier", "Perimeter", "Vitesse")
+    table["columns"] = ("Fichier", "Perimetre","Epaisseur", "Vitesse","Temps Decoupage")
     table.column("#0", width=0, stretch=False)
     table.column("Fichier", anchor="w", width=300)
-    table.column("Perimeter", anchor="center", width=200)
-    table.column("Vitesse", anchor="center", width=200)
+    table.column("Perimetre", anchor="center", width=200)
+    table.column("Epaisseur", anchor="center", width=100)
+    table.column("Vitesse", anchor="center", width=100)
+    table.column("Temps Decoupage", anchor="center", width=200)
     table.heading("#0", text="", anchor="w")
     table.heading("Fichier", text="Filename", anchor="center")
-    table.heading("Perimeter", text="Perimeter", anchor="center")
+    table.heading("Perimetre", text="Perimeter", anchor="center")
+    table.heading("Epaisseur", text="Epaisseur", anchor="center")
     table.heading("Vitesse", text="Vitesse", anchor="center")
-    table.place(x=150, y=200)
+    table.heading("Temps Decoupage", text="Temps Decoupage", anchor="center")
+    table.place(x=50, y=200)
 
     image_image_1 = PhotoImage(file="View/assets/home_assets/image_1.png")
     image_1 = canvas.create_image(
@@ -97,7 +102,21 @@ def create_result_window():
 
 
 
+
+    def fill_table(conn,cursor,table):
+        try:
+            file_data=get_file_data(conn,cursor)
+            for file_entry in file_data:
+                 filename, perimeter, thickness,speed = file_entry
+                 duration = perimeter/speed
+                 table.insert("", "end", values=(filename, perimeter, thickness, speed,duration))
+
+        except Exception as e:
+            print("An error occurred while fetching files:", e)
+
+
     window.resizable(False, False)
+    fill_table(conn,cursor,table)
     window.mainloop()
 
 
@@ -105,4 +124,4 @@ def create_result_window():
 
 
 
-create_result_window()
+#create_result_window()

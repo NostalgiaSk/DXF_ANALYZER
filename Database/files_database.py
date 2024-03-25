@@ -6,23 +6,41 @@ conn = sqlite3.connect('files.db')
 cursor = conn.cursor()
 
 
+
 def create_tables(cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS files
                       (id INTEGER PRIMARY KEY ,
                        file_name TEXT,
                        dxf_blob BLOB,
                        perimeter REAL,
-                       thickness REAL)''')
+                       thickness REAL,
+                       speed REAL)''')
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS thicknesses
                       (id INTEGER PRIMARY KEY ,
-                       thickness REAL)''')
-    
-                   
-# for value in range(1, 6):
-#     cursor.execute("INSERT INTO thicknesses (thickness) VALUES (?)", (value,))
+                       thickness REAL UNIQUE,
+                       speed REAL UNIQUE)''')
 
-def update_thickness_in_database(cursor, new_thickness):
+
+
+def init_databases(conn,cursor):
+    cursor.execute("DELETE FROM files")
+    cursor.execute("DELETE FROM thicknesses")
+    thickness_speed_values = [
+    (1, 10),  
+    (2, 20),  
+    (3, 30),  
+    (4, 40),  
+    (5, 50) 
+    ]
+    for thickness, speed in thickness_speed_values:
+          cursor.execute("INSERT INTO thicknesses (thickness, speed) VALUES (?, ?)", (thickness, speed))
+    conn.commit()
+      
+
+
+#FILES TABLE MANIPULATION
+def update_thickness_in_database(cursor, new_thickness,conn):
     try:
         cursor.execute("UPDATE files SET thickness = ?", (new_thickness,))
         conn.commit()
@@ -32,18 +50,18 @@ def update_thickness_in_database(cursor, new_thickness):
 
 conn.commit()
 
-#Insert values to table after selection
 
-def insert_into_files_table(file: File, cursor,conn):
+def insert_into_files_table(file: File, cursor, conn):
     try:
-        cursor.execute("INSERT INTO files (file_name, dxf_blob, perimeter, thickness) VALUES (?, ?, ?, ?)",
-                       (file.file_name, sqlite3.Binary(file.file_content), file.perimeter, file.thickness))
+        cursor.execute("INSERT INTO files (file_name, dxf_blob, perimeter, thickness, speed) VALUES (?, ?, ?, ?, ?)",
+                       (file.file_name, sqlite3.Binary(file.file_content), file.perimeter, file.thickness, file.cutting_speed))
         conn.commit()
         print("File saved successfully.")
     except Exception as e:
         print("An error occurred 3:", e)
 
-def delete_all_files(cursor):
+
+def delete_all_files(cursor,conn):
     try:
         cursor.execute("DELETE FROM files")
         conn.commit()
@@ -51,16 +69,40 @@ def delete_all_files(cursor):
     except Exception as e:
         print("An error occurred 4:", e)
 
+
+def get_file_data(conn,cursor):
+    try:
+        cursor.execute("SELECT file_name, perimeter, thickness,speed FROM files")
+        file_data = cursor.fetchall() 
+        conn.close()  
+        return file_data
+    except Exception as e:
+        print("An error occurred while fetching files:", e)
+        return []
+
+
+#THICKNESS TABLE MANIPULATION
 def get_thickness_values(cursor):
     cursor.execute("SELECT thickness FROM thicknesses")
     thickness_values = cursor.fetchall()
     return thickness_values
 
-def init_databases(conn,cursor):
-    cursor.execute("DELETE FROM files")
-    cursor.execute("DELETE FROM thicknesses")
-    for value in range(1, 6):
-       cursor.execute("INSERT INTO thicknesses (thickness) VALUES (?)", (value,))
-    conn.commit()
+
+
+def fetch_cuuting_speed(cursor, thickness):
+    try:
+        cursor.execute("SELECT speed FROM thicknesses WHERE thickness = ?", (thickness,))
+        speed_result = cursor.fetchone()
+        if speed_result:
+            return speed_result[0]
+        else:
+            print(f"No speed found for thickness {thickness}.")
+            return None
+    except Exception as e:
+        print("An error occurred:", e)
+        return None
+    
+
+
 
 conn.close()
