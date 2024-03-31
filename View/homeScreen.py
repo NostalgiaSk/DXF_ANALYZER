@@ -1,11 +1,12 @@
 from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
 import ezdxf  
 import math
-from Database.files_database import get_thickness_values , insert_into_files_table,update_thickness_in_database,delete_all_files,fetch_cuuting_speed
+from Database.files_database import get_thickness_values , insert_into_files_table,delete_all_files
 import sqlite3
 from tkinter.messagebox import showwarning
 from Entities.file import File
-from View.resultScreen import create_result_window
+from View.choose_thickness_screen import create_choose_thickness_window
+
 
 
 def create_home_window():
@@ -153,19 +154,6 @@ def create_home_window():
         height=34.0
     )
 
-
-    text_label = Label(window, text="Choisir l'épaisseur désiré", bg="#FFFFFF")
-    text_label.place(x=420, y=450)
-
-    dropdown_var = StringVar()
-    dropdown = ttk.Combobox(window, textvariable=dropdown_var, values=thickness_values, state="readonly")
-    dropdown.current(0)  # Set default value to 1
-    dropdown.place(      
-        x=400,
-        y=470,
-        width=200,
-        height=34.0)
-
     def calculate_perimeter(entity):
         if entity.dxftype() == 'LINE':
             start_point = entity.dxf.start
@@ -205,28 +193,19 @@ def create_home_window():
     def reset_table(table ,cursor,conn):
         table.delete(*table.get_children()) 
         delete_all_files(cursor,conn)
-        conn.close()
+        
 
     def save_data_and_navigate_to_result(conn,table,cursor):
         if not table.get_children():
             showwarning("Empty Table", "The table is empty!")
             return
-        try:
-            new_thickness = float(dropdown.get())
-        except ValueError:
-            showwarning("Invalid Value", "Please select a valid thickness.")
-            return
-        cutting_speed = fetch_cuuting_speed(cursor,new_thickness)
-        update_thickness_in_database(cursor, new_thickness,cutting_speed,conn)
         conn.commit()
         window.destroy()
-        create_result_window() 
+        create_choose_thickness_window()
     
     def save_file(conn,cursor ,filename, perimeter, file_content):
-        thickness = float(dropdown.get())
-        cutting_speed = fetch_cuuting_speed(cursor,thickness)
-        print("cuttting speed issss {cutting_speed}")
-        file = File(filename,file_content, perimeter, thickness,cutting_speed)
+        
+        file = File(filename,file_content, perimeter,0,0)
         try:
             insert_into_files_table(file, cursor,conn)
             conn.commit()

@@ -51,17 +51,6 @@ def init_databases(conn, cursor):
 
 
 #FILES TABLE MANIPULATION
-def update_thickness_in_database(cursor, new_thickness,new_speed,conn):
-    try:
-        cursor.execute("UPDATE files SET thickness = ?", (new_thickness,))
-        cursor.execute("UPDATE files SET speed = ?", (new_speed,))
-        conn.commit()
-        print("Thickness and speed updated successfully.")
-    except sqlite3.Error as e:
-        print("An error occurred while updating thickness:", e)
-
-conn.commit()
-
 
 def insert_into_files_table(file: File, cursor, conn):
     try:
@@ -85,12 +74,20 @@ def delete_all_files(cursor,conn):
 def get_file_data(conn,cursor):
     try:
         cursor.execute("SELECT file_name, perimeter, thickness,speed FROM files")
-        file_data = cursor.fetchall() 
-        conn.close()  
+        file_data = cursor.fetchall()   
         return file_data
     except Exception as e:
         print("An error occurred while fetching files:", e)
         return []
+
+def update_file_data(conn,cursor,filename,thickness,speed):
+    try:
+        cursor.execute("UPDATE files SET thickness = ?, speed = ? WHERE file_name = ?", (thickness, speed, filename))
+        conn.commit()
+        print(f"File values updated for {filename}.")
+    except Exception as e:
+        print("An error occurred while updating file values:", e)
+
 
 
 #THICKNESS TABLE MANIPULATION
@@ -101,20 +98,36 @@ def get_thickness_values(cursor):
 
 
 
-def fetch_cuuting_speed(cursor, thickness):
+def fetch_cutting_speed(conn, cursor, thickness):
     try:
-        cursor.execute("SELECT speed FROM thicknesses WHERE thickness = ?", (thickness,))
-        speed_result = cursor.fetchone()
-        if speed_result:
-            return speed_result[0]
-        else:
-            print(f"No speed found for thickness {thickness}.")
-            return None
+        with conn:
+            cursor.execute("SELECT speed FROM thicknesses WHERE thickness = ?", (thickness,))
+            speed_result = cursor.fetchone()
+            if speed_result:
+                return speed_result[0]
+            else:
+                print(f"No speed found for thickness {thickness}.")
+                return None
     except Exception as e:
         print("An error occurred:", e)
         return None
-    
 
 
 
-conn.close()
+def fetch_cutting_speed(conn, cursor, thickness):
+    try:
+        with conn:
+            cursor.execute("SELECT speed FROM thicknesses WHERE thickness = ?", (thickness,))
+            speed_result = cursor.fetchone()
+            if speed_result:
+                return speed_result[0]
+            else:
+                print(f"No speed found for thickness {thickness}.")
+                return None
+    except Exception as e:
+        print("An error occurred:", e)
+        return None
+
+
+
+
