@@ -1,0 +1,59 @@
+<body>
+    <div class="page-container">
+
+
+        <div ><img style="height: 18px;" src="/images/dxf.png" /></div>
+    
+        <h2>Rapport</h2>
+        <h2>{{today_date}}</h2>
+        <hr>
+        <p>Epaisseurs utilis&eacute;s et vitesses correspondantes</p>
+        <table class="tg">
+            <thead>
+                <tr>
+                    <th class="tg-o0zx">Épaisseur</th>
+                    <th class="tg-86ya">Vitesse</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in thickness_speed_data %}
+                    <tr>
+                        <td class="tg-zq5u">{{ data[0] }}</td>
+                        <td class="tg-zq5u">{{ data[1] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    
+    
+        <hr>
+    
+        <p>Temps de d&eacute;coupage des pieces en fontion du perim&eacute;tre et &eacute;passeur </p>
+    
+        <table class="tg">
+            <thead>
+                <tr>
+                    <th>Fichier</th>
+                    <th>Perimètre</th>
+                    <th>Épaisseur</th>
+                    <th>Vitesse</th>
+                    <th>Temps decoupage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file_info in file_data %}
+                    <tr>
+                        <td>{{ file_info[0][:20] }}</td>
+                        <td>{{ file_info[1] }}</td>
+                        <td>{{ file_info[2] }}</td>
+                        <td>{{ file_info[3] }}</td>
+                        <td>{{ file_info[4] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    </div>
+    
+</body>

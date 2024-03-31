@@ -3,6 +3,7 @@ import ezdxf
 import math
 from Database.files_database import get_file_data
 import sqlite3
+from pdf.pdf_generation import save_pdf
 
 
 def create_result_window():
@@ -75,7 +76,7 @@ def create_result_window():
         image=button_image_3,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: print("print button  clicked"),
+        command=lambda: save_pdf(),
         relief="flat"
     )
     button_3.place(
