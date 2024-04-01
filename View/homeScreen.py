@@ -6,6 +6,7 @@ import sqlite3
 from tkinter.messagebox import showwarning
 from Entities.file import File
 from View.choose_thickness_screen import create_choose_thickness_window
+from View.update_params_screen import create_window
 
 
 
@@ -151,7 +152,7 @@ def create_home_window():
         image=button_image_4,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: print("button_4 clicked"),
+        command=lambda: navigate_to_update_params(),
         relief="flat"
     )
     button_4.place(
@@ -196,6 +197,7 @@ def create_home_window():
             return total_perimeter
         else:
             return 0
+            
 
     def reset_table(table ,cursor,conn):
         table.delete(*table.get_children()) 
@@ -219,6 +221,10 @@ def create_home_window():
         except Exception as e:
             print("An error occurred2:", e)
         conn.commit()
+    
+    def navigate_to_update_params():
+        window.destroy()
+        create_window(create_home_window)
 
     window.resizable(False, False)
     window.mainloop()

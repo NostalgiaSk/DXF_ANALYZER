@@ -18,9 +18,8 @@ def create_tables(cursor):
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS thicknesses
                       (id INTEGER PRIMARY KEY ,
-                       thickness REAL UNIQUE,
-                       speed REAL UNIQUE)''')
-
+                       thickness REAL ,
+                       speed REAL )''')
 
 
 def init_databases(conn, cursor):
@@ -96,21 +95,6 @@ def get_thickness_values(cursor):
     thickness_values = cursor.fetchall()
     return thickness_values
 
-
-
-def fetch_cutting_speed(conn, cursor, thickness):
-    try:
-        with conn:
-            cursor.execute("SELECT speed FROM thicknesses WHERE thickness = ?", (thickness,))
-            speed_result = cursor.fetchone()
-            if speed_result:
-                return speed_result[0]
-            else:
-                print(f"No speed found for thickness {thickness}.")
-                return None
-    except Exception as e:
-        print("An error occurred:", e)
-        return None
 
 
 
