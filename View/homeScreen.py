@@ -7,6 +7,7 @@ from tkinter.messagebox import showwarning
 from Entities.file import File
 from View.choose_thickness_screen import create_choose_thickness_window
 from View.update_params_screen import create_window
+import dxfgrabber
 
 
 
@@ -183,21 +184,43 @@ def create_home_window():
             return total_perimeter
         elif entity.dxftype() == 'SPLINE':
             total_perimeter = 0
-            if hasattr(entity, 'fit_points'):
-                control_points = entity.fit_points
-            elif hasattr(entity, 'control_points'):
-                control_points = entity.control_points()
-            else:
-                control_points = list(entity.approximate_fit_points())
+            # if hasattr(entity, 'fit_points'):
+            #     control_points = entity.fit_points
+            # elif hasattr(entity, 'control_points'):
+            #     control_points = entity.control_points()
+            # else:
+            #     control_points = list(entity.approximate_fit_points())
 
-            for i in range(len(control_points) - 1):
-                ds = math.sqrt((control_points[i][0] - control_points[i + 1][0]) ** 2 + 
-                            (control_points[i][1] - control_points[i + 1][1]) ** 2)  
-                total_perimeter += ds
+            # for i in range(len(control_points) - 1):
+            #     ds = math.sqrt((control_points[i][0] - control_points[i + 1][0]) ** 2 + 
+            #                 (control_points[i][1] - control_points[i + 1][1]) ** 2)  
+            #     total_perimeter += ds
+            # return total_perimeter
+            perimeter =calculate_spline_perimeter(entity)
+            total_perimeter += perimeter
             return total_perimeter
+
         else:
             return 0
-            
+
+    def calculate_spline_perimeter(spline):
+        perimeter = 0
+        points = spline.control_points
+        if len(points) < 2:
+           return 0
+        for i in range(len(points) - 1):
+            if len(points[i]) == 2:
+                 x1, y1 = points[i]
+            else:
+                 x1, y1, _ = points[i]
+
+            if len(points[i + 1]) == 2:
+                 x2, y2 = points[i + 1]
+            else:
+                 x2, y2, _ = points[i + 1]
+            perimeter += math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+        return perimeter
 
     def reset_table(table ,cursor,conn):
         table.delete(*table.get_children()) 
