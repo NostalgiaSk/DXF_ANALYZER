@@ -67,10 +67,17 @@ def create_home_window():
 
     button_image_1 = PhotoImage(file="View/assets/home_assets/button_1.png")
 
+    global selected_files_count
+    selected_files_count = 0
     def open_file():
+        global selected_files_count
         try:
             filepath = filedialog.askopenfilename(filetypes=[("DXF Files", "*.dxf")])
             if filepath:
+                if selected_files_count >= 10:
+                   showwarning("Limite maximale atteinte", "Vous pouvez selectionner que 10 fichier a la fois .")
+                   return
+                selected_files_count += 1
                 try:
                     doc = ezdxf.readfile(filepath)
                     msp = doc.modelspace()
