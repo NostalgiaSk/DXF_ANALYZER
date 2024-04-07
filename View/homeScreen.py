@@ -184,18 +184,6 @@ def create_home_window():
             return total_perimeter
         elif entity.dxftype() == 'SPLINE':
             total_perimeter = 0
-            # if hasattr(entity, 'fit_points'):
-            #     control_points = entity.fit_points
-            # elif hasattr(entity, 'control_points'):
-            #     control_points = entity.control_points()
-            # else:
-            #     control_points = list(entity.approximate_fit_points())
-
-            # for i in range(len(control_points) - 1):
-            #     ds = math.sqrt((control_points[i][0] - control_points[i + 1][0]) ** 2 + 
-            #                 (control_points[i][1] - control_points[i + 1][1]) ** 2)  
-            #     total_perimeter += ds
-            # return total_perimeter
             perimeter =calculate_spline_perimeter(entity)
             total_perimeter += perimeter
             return total_perimeter
@@ -237,7 +225,7 @@ def create_home_window():
     
     def save_file(conn,cursor ,filename, perimeter, file_content):
         
-        file = File(filename,file_content, perimeter,0,0)
+        file = File(filename,file_content, perimeter,0,0,0,0,0,0)
         try:
             insert_into_files_table(file, cursor,conn)
             conn.commit()

@@ -14,7 +14,11 @@ def create_tables(cursor):
                        dxf_blob BLOB,
                        perimeter REAL,
                        thickness REAL,
-                       speed REAL)''')
+                       speed REAL,
+                       cutting_duration REAL,
+                       folds_number REAL,
+                       heigh REAL,
+                       widht REAL)''')
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS thicknesses
                       (id INTEGER PRIMARY KEY ,
