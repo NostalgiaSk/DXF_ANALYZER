@@ -1,8 +1,5 @@
 <body>
     <div class="page-container">
-
-
-        <div ><img style="height: 18px;" src="/images/dxf.png" /></div>
     
         <h2>Rapport</h2>
         <h2>{{today_date}}</h2>
@@ -11,7 +8,7 @@
         <table class="tg">
             <thead>
                 <tr>
-                    <th class="tg-o0zx">Épaisseur</th>
+                    <th class="tg-o0zx">&Eacute;paisseur</th>
                     <th class="tg-86ya">Vitesse</th>
                 </tr>
             </thead>
@@ -29,30 +26,20 @@
     
         <hr>
     
-        <p>Temps de d&eacute;coupage des pieces en fontion du perim&eacute;tre et &eacute;passeur </p>
+        <p>Temps de d&eacute;coupage des pi&eacute;ces en fonction du perim&eacute;tre et &eacute;paisseur </p>
     
-        <table class="tg">
-            <thead>
-                <tr>
-                    <th>Fichier</th>
-                    <th>Perimètre</th>
-                    <th>Épaisseur</th>
-                    <th>Vitesse</th>
-                    <th>Temps decoupage</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for file_info in file_data %}
-                    <tr>
-                        <td>{{ file_info[0][:20] }}</td>
-                        <td>{{ file_info[1] }}</td>
-                        <td>{{ file_info[2] }}</td>
-                        <td>{{ file_info[3] }}</td>
-                        <td>{{ file_info[4] }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% for file_info in file_data %}
+        <div class="file-info">
+            <p><strong>Fichier:</strong> {{ file_info[0][:20] }}</p>
+            <p><strong>Perim&eacute;tre:</strong> {{ file_info[1] }} mm</p>
+            <p><strong>&Eacute;paisseur:</strong> {{ file_info[2] }} mm</p>
+            <p><strong>Vitesse:</strong> {{ file_info[3] }}</p>
+            <p><strong>Temps decoupage:</strong> {{ file_info[4] }} secondes</p>
+            <p><strong>Nombre des plis:</strong> {{ file_info[5] }}</p>
+            <p><strong>Longueur:</strong> {{ file_info[6] }} mm</p>
+            <p><strong>Largeur:</strong> {{ file_info[7] }} mm</p>
+        </div>
+        {% endfor %}
     
     </div>
     

@@ -1,7 +1,7 @@
 from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
 import ezdxf  
 import math
-from Database.files_database import get_file_data
+from Database.files_database import get_file_data , update_file_cutting_time
 import sqlite3
 from pdf.pdf_generation import save_pdf
 
@@ -110,6 +110,7 @@ def create_result_window():
             for file_entry in file_data:
                  filename, perimeter, thickness,speed = file_entry
                  duration = perimeter/speed
+                 update_file_cutting_time(conn,cursor,filename,duration)
                  table.insert("", "end", values=(filename, perimeter, thickness, speed,duration))
 
         except Exception as e:

@@ -91,6 +91,15 @@ def update_file_data(conn,cursor,filename,thickness,speed):
     except Exception as e:
         print("An error occurred while updating file values:", e)
 
+def update_file_cutting_time(conn,cursor,filename,cutting_duration):
+    try:
+        cursor.execute("UPDATE files SET cutting_duration = ? WHERE file_name = ?", (cutting_duration, filename))
+        conn.commit()
+        print(f"File cutting duration updated for {filename}.")
+    except Exception as e:
+        print("An error occurred while updating cutting duration :", e)
+
+
 
 
 #THICKNESS TABLE MANIPULATION

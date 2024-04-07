@@ -1,83 +1,65 @@
-
-.tg {
-  border-collapse: collapse;
-  border-color: #9ABAD9;
-  border-spacing: 0;
-}
-
-.tg td {
-  background-color: #EBF5FF;
-  border-color: #9ABAD9;
-  border-style: solid;
-  border-width: 1px;
-  color: #444;
+body {
   font-family: Arial, sans-serif;
-  font-size: 14px;
-  overflow: hidden;
-  padding: 12px 20px;
-  word-break: normal;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa; /* Light gray background */
 }
-
-.tg th {
-  background-color: #409cff;
-  border-color: #9ABAD9;
-  border-style: solid;
-  border-width: 1px;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: normal;
-  overflow: hidden;
-  padding: 12px 20px;
-  word-break: normal;
-}
-
-.tg .tg-zq5u {
-  border-color: inherit;
-  font-family: "Times New Roman", Times, serif !important;
-  font-size: 20px;
-  text-align: center;
-  vertical-align: middle
-}
-
-.tg .tg-86ya {
-  border-color: inherit;
-  font-family: "Times New Roman", Times, serif !important;
-  font-size: 22px;
-  font-style: italic;
-  font-weight: bold;
-  text-align: left;
-  text-decoration: underline;
-  vertical-align: top
-}
-
-.tg .tg-o0zx {
-  font-family: "Times New Roman", Times, serif !important;
-  font-size: 22px;
-  font-style: italic;
-  font-weight: bold;
-  text-align: left;
-  text-decoration: underline;
-  vertical-align: top
-}
-
-.tg .tg-0s63 {
-  font-family: "Times New Roman", Times, serif !important;
-  font-size: 20px;
-  text-align: center;
-  vertical-align: middle
-}
-
 
 .page-container {
-  display: flex;
-  justify-content: center;
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff; /* White background */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
+h2 {
+  color: #007bff; /* Blue color */
+  margin-top: 0;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ced4da; /* Gray border */
+  margin: 20px 0;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ced4da; /* Gray border */
+}
+
+th {
+  background-color: #007bff; /* Blue color */
+  color: #fff; /* White text */
+}
+
+.file-info {
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.file-info p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.file-info strong {
+  color: #007bff;
 }
