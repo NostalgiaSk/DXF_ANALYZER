@@ -85,6 +85,7 @@ def create_home_window():
                     msp = doc.modelspace()
                     total_perimeter = 0
                     entity_count = 0
+                    dashed_line_count = 0
                     file_content = b""
                     for entity in msp:
                         perimeter = calculate_perimeter(entity)
@@ -93,7 +94,11 @@ def create_home_window():
                         entity_info = f"Entity Type: {entity.dxftype()}, Perimeter: {perimeter:.2f}\n"
                         file_content += entity_info.encode('utf-8')
                         print(f"Entity {entity_count} Type = {entity.dxftype()}: Perimeter = {perimeter:.2f}")
+                        if entity.dxftype() == 'LINE'  and entity.dxf.linetype in ['CENTER', 'CENTER2', 'CENTERX2'] :
+                            dashed_line_count += 1
                     print(f"Total perimeter of {entity_count} entities: {total_perimeter:.2f}")
+                    print(f"Number of Folds: {dashed_line_count}")
+
                     filename = filepath.split("/")[-1]
                     save_file(conn,cursor, filename, total_perimeter, file_content)
                     table.insert("", "end", values=(filename, f"{total_perimeter:.2f}")) 
