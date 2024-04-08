@@ -100,7 +100,7 @@ def create_home_window():
                     print(f"Number of Folds: {dashed_line_count}")
 
                     filename = filepath.split("/")[-1]
-                    save_file(conn,cursor, filename, total_perimeter, file_content)
+                    save_file(conn,cursor, filename, total_perimeter, file_content,dashed_line_count)
                     table.insert("", "end", values=(filename, f"{total_perimeter:.2f}")) 
                 except IOError:
                     print("Not a DXF file or a generic I/O error.")
@@ -228,9 +228,9 @@ def create_home_window():
         window.destroy()
         create_choose_thickness_window()
     
-    def save_file(conn,cursor ,filename, perimeter, file_content):
+    def save_file(conn,cursor ,filename, perimeter, file_content,nb_folds):
         
-        file = File(filename,file_content, perimeter,0,0,0,0,0,0)
+        file = File(filename,file_content, perimeter,0,0,0,nb_folds,0,0)
         try:
             insert_into_files_table(file, cursor,conn)
             conn.commit()

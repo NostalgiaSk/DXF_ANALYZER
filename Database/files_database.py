@@ -57,8 +57,8 @@ def init_databases(conn, cursor):
 
 def insert_into_files_table(file: File, cursor, conn):
     try:
-        cursor.execute("INSERT INTO files (file_name, dxf_blob, perimeter, thickness, speed) VALUES (?, ?, ?, ?, ?)",
-                       (file.file_name, sqlite3.Binary(file.file_content), file.perimeter, file.thickness, file.cutting_speed))
+        cursor.execute("INSERT INTO files (file_name, dxf_blob, perimeter, thickness, speed,folds_number) VALUES (?, ?, ?, ?, ?, ?)",
+                       (file.file_name, sqlite3.Binary(file.file_content), file.perimeter, file.thickness, file.cutting_speed , file.nb_folds))
         conn.commit()
         print("File saved successfully.")
     except Exception as e:
