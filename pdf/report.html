@@ -3,26 +3,7 @@
     
         <h2>Rapport</h2>
         <h2>{{today_date}}</h2>
-        <hr>
-        <p>Epaisseurs utilis&eacute;s et vitesses correspondantes</p>
-        <table class="tg">
-            <thead>
-                <tr>
-                    <th class="tg-o0zx">&Eacute;paisseur</th>
-                    <th class="tg-86ya">Vitesse</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in thickness_speed_data %}
-                    <tr>
-                        <td class="tg-zq5u">{{ data[0] }}</td>
-                        <td class="tg-zq5u">{{ data[1] }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
         
-    
     
         <hr>
     

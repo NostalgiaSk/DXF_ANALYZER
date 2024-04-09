@@ -1,15 +1,12 @@
-from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog , StringVar , Label
-import ezdxf  
+from tkinter import Tk, Canvas, Button, PhotoImage, ttk, filedialog, StringVar, Label
+import ezdxf
 import math
-from Database.files_database import get_thickness_values , insert_into_files_table,delete_all_files
 import sqlite3
 from tkinter.messagebox import showwarning
 from Entities.file import File
+from Database.files_database import get_thickness_values, insert_into_files_table, delete_all_files
 from View.choose_thickness_screen import create_choose_thickness_window
 from View.update_params_screen import create_window
-import dxfgrabber
-
-
 
 def create_home_window():
     window = Tk()
@@ -87,6 +84,10 @@ def create_home_window():
                     entity_count = 0
                     dashed_line_count = 0
                     file_content = b""
+                    min_x = float('inf')
+                    max_x = float('-inf')
+                    min_y = float('inf')
+                    max_y = float('-inf')
                     for entity in msp:
                         perimeter = calculate_perimeter(entity)
                         total_perimeter += perimeter
@@ -96,11 +97,18 @@ def create_home_window():
                         print(f"Entity {entity_count} Type = {entity.dxftype()}: Perimeter = {perimeter:.2f}")
                         if entity.dxftype() == 'LINE'  and entity.dxf.linetype in ['CENTER', 'CENTER2', 'CENTERX2'] :
                             dashed_line_count += 1
+                        # Update min and max coordinates
+                        if entity.dxftype() in ['LINE', 'CIRCLE', 'ARC']:
+                             min_x, max_x, min_y, max_y = update_min_max_coordinates(entity, min_x, max_x, min_y, max_y)
+
+                    height = max_y - min_y
+                    width =  max_x -min_x        
                     print(f"Total perimeter of {entity_count} entities: {total_perimeter:.2f}")
                     print(f"Number of Folds: {dashed_line_count}")
+                    print(f"Heigh {height} width {width}")
 
                     filename = filepath.split("/")[-1]
-                    save_file(conn,cursor, filename, total_perimeter, file_content,dashed_line_count)
+                    save_file(conn, cursor, filename, total_perimeter, file_content, dashed_line_count,height,width)
                     table.insert("", "end", values=(filename, f"{total_perimeter:.2f}")) 
                 except IOError:
                     print("Not a DXF file or a generic I/O error.")
@@ -128,7 +136,7 @@ def create_home_window():
         image=button_image_2,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: reset_table(table,cursor,conn),
+        command=lambda: reset_table(table, cursor, conn),
         relief="flat"
     )
     button_2.place(
@@ -143,7 +151,7 @@ def create_home_window():
         image=button_image_3,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda:save_data_and_navigate_to_result(conn,table, cursor),
+        command=lambda: save_data_and_navigate_to_result(conn, table, cursor),
         relief="flat"
     )
     button_3.place(
@@ -189,7 +197,7 @@ def create_home_window():
             return total_perimeter
         elif entity.dxftype() == 'SPLINE':
             total_perimeter = 0
-            perimeter =calculate_spline_perimeter(entity)
+            perimeter = calculate_spline_perimeter(entity)
             total_perimeter += perimeter
             return total_perimeter
 
@@ -228,9 +236,9 @@ def create_home_window():
         window.destroy()
         create_choose_thickness_window()
     
-    def save_file(conn,cursor ,filename, perimeter, file_content,nb_folds):
+    def save_file(conn,cursor ,filename, perimeter, file_content,nb_folds,height,width):
         
-        file = File(filename,file_content, perimeter,0,0,0,nb_folds,0,0)
+        file = File(filename,file_content, perimeter,0,0,0,nb_folds,height,width)
         try:
             insert_into_files_table(file, cursor,conn)
             conn.commit()
@@ -245,7 +253,42 @@ def create_home_window():
     window.resizable(False, False)
     window.mainloop()
 
-
-
-
-
+def update_min_max_coordinates(entity, min_x, max_x, min_y, max_y):
+    if entity.dxftype() == 'CIRCLE':
+        x, y, _ = entity.dxf.center
+        radius = entity.dxf.radius
+        min_x = min(min_x, x - radius)
+        max_x = max(max_x, x + radius)
+        min_y = min(min_y, y - radius)
+        max_y = max(max_y, y + radius)
+    elif entity.dxftype() == 'ARC':
+        x, y, _ = entity.dxf.center
+        radius = entity.dxf.radius
+        start_angle = entity.dxf.start_angle
+        end_angle = entity.dxf.end_angle
+        angle = abs(end_angle - start_angle)
+        if angle > 360:
+            angle = 360
+        arc_length = 2 * math.pi * radius * (angle / 360)
+        min_x = min(min_x, x - radius)
+        max_x = max(max_x, x + radius)
+        min_y = min(min_y, y - radius)
+        max_y = max(max_y, y + radius)
+        if start_angle < end_angle:
+            min_x = min(min_x, x + radius * math.cos(math.radians(start_angle)))
+            max_x = max(max_x, x + radius * math.cos(math.radians(end_angle)))
+            min_y = min(min_y, y + radius * math.sin(math.radians(start_angle)))
+            max_y = max(max_y, y + radius * math.sin(math.radians(end_angle)))
+        else:
+            min_x = min(min_x, x + radius * math.cos(math.radians(end_angle)))
+            max_x = max(max_x, x + radius * math.cos(math.radians(start_angle)))
+            min_y = min(min_y, y + radius * math.sin(math.radians(end_angle)))
+            max_y = max(max_y, y + radius * math.sin(math.radians(start_angle)))
+    elif entity.dxftype() in ['LINE', 'LWPOLYLINE', 'POLYLINE']:
+        x1, y1, _ = entity.dxf.start
+        x2, y2, _ = entity.dxf.end
+        min_x = min(min_x, x1, x2)
+        max_x = max(max_x, x1, x2)
+        min_y = min(min_y, y1, y2)
+        max_y = max(max_y, y1, y2)
+    return min_x, max_x, min_y, max_y

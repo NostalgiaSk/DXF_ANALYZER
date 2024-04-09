@@ -8,7 +8,7 @@ import sqlite3
 #fetch file data from the database
 def get_file_data(cursor):
     try:
-        cursor.execute("SELECT file_name, perimeter, thickness, speed,cutting_duration ,folds_number,heigh ,widht FROM files")
+        cursor.execute("SELECT file_name, perimeter, thickness, speed,cutting_duration ,folds_number,heigh ,width FROM files")
         file_data = cursor.fetchall()
         return file_data
     except Exception as e:

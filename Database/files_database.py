@@ -18,7 +18,7 @@ def create_tables(cursor):
                        cutting_duration REAL,
                        folds_number REAL,
                        heigh REAL,
-                       widht REAL)''')
+                       width REAL)''')
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS thicknesses
                       (id INTEGER PRIMARY KEY ,
@@ -57,10 +57,8 @@ def init_databases(conn, cursor):
 
 def insert_into_files_table(file: File, cursor, conn):
     try:
-        cursor.execute("INSERT INTO files (file_name, dxf_blob, perimeter, thickness, speed,folds_number) VALUES (?, ?, ?, ?, ?, ?)",
-                       (file.file_name, sqlite3.Binary(file.file_content), file.perimeter, file.thickness, file.cutting_speed , file.nb_folds))
-        conn.commit()
-        print("File saved successfully.")
+         cursor.execute("INSERT INTO files (file_name, dxf_blob, perimeter, thickness, speed, folds_number, heigh, width) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                       (file.file_name, sqlite3.Binary(file.file_content), file.perimeter, file.thickness, file.cutting_speed, file.nb_folds, file.height, file.width))
     except Exception as e:
         print("An error occurred 3:", e)
 
