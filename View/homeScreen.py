@@ -177,50 +177,52 @@ def create_home_window():
     )
 
     def calculate_perimeter(entity):
+        # Exclude certain line types
+        if hasattr(entity.dxf, 'linetype') and entity.dxf.linetype in ['CENTER', 'CENTER2', 'CENTERX2']:
+            return 0
+
         if entity.dxftype() == 'LINE':
             start_point = entity.dxf.start
             end_point = entity.dxf.end
-            return start_point.distance(end_point)
+            return math.hypot(end_point[0] - start_point[0], end_point[1] - start_point[1])
         elif entity.dxftype() == 'CIRCLE':
             radius = entity.dxf.radius
             return 2 * math.pi * radius
         elif entity.dxftype() == 'ARC':
             radius = entity.dxf.radius
-            angle = entity.dxf.end_angle - entity.dxf.start_angle
-            return (angle / 360) * 2 * math.pi * radius
+            start_angle = math.radians(entity.dxf.start_angle)
+            end_angle = math.radians(entity.dxf.end_angle)
+            angle = end_angle - start_angle
+            if angle < 0:
+                angle += 2 * math.pi
+            return angle * radius
         elif entity.dxftype() == 'LWPOLYLINE' or entity.dxftype() == 'POLYLINE':
-            total_perimeter = 0
-            for segment in entity.get_points():
-                start_point = segment[0]
-                end_point = segment[-1]
-                total_perimeter += start_point.distance(end_point)
-            return total_perimeter
+            return calculate_polyline_perimeter(entity)
         elif entity.dxftype() == 'SPLINE':
-            total_perimeter = 0
-            perimeter = calculate_spline_perimeter(entity)
-            total_perimeter += perimeter
-            return total_perimeter
-
+            return calculate_spline_perimeter(entity)
         else:
             return 0
+
+    def calculate_polyline_perimeter(polyline):
+        total_perimeter = 0
+        points = polyline.get_points(format='xy')
+        for i in range(len(points) - 1):
+            start_point = points[i]
+            end_point = points[i + 1]
+            total_perimeter += math.hypot(end_point[0] - start_point[0], end_point[1] - start_point[1])
+        if polyline.is_closed:
+            total_perimeter += math.hypot(points[-1][0] - points[0][0], points[-1][1] - points[0][1])
+        return total_perimeter
 
     def calculate_spline_perimeter(spline):
         perimeter = 0
         points = spline.control_points
         if len(points) < 2:
-           return 0
+            return 0
         for i in range(len(points) - 1):
-            if len(points[i]) == 2:
-                 x1, y1 = points[i]
-            else:
-                 x1, y1, _ = points[i]
-
-            if len(points[i + 1]) == 2:
-                 x2, y2 = points[i + 1]
-            else:
-                 x2, y2, _ = points[i + 1]
-            perimeter += math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
+            x1, y1 = points[i][:2]
+            x2, y2 = points[i + 1][:2]
+            perimeter += math.hypot(x2 - x1, y2 - y1)
         return perimeter
 
     def reset_table(table ,cursor,conn):
