@@ -257,40 +257,57 @@ def create_home_window():
 
 def update_min_max_coordinates(entity, min_x, max_x, min_y, max_y):
     if entity.dxftype() == 'CIRCLE':
-        x, y, _ = entity.dxf.center
+        center = entity.dxf.center
+        if not isinstance(center, tuple):
+            center = tuple(center)
+        x, y = center[:2]
         radius = entity.dxf.radius
         min_x = min(min_x, x - radius)
         max_x = max(max_x, x + radius)
         min_y = min(min_y, y - radius)
         max_y = max(max_y, y + radius)
     elif entity.dxftype() == 'ARC':
-        x, y, _ = entity.dxf.center
+        center = entity.dxf.center
+        if not isinstance(center, tuple):
+            center = tuple(center)
+        x, y = center[:2]
         radius = entity.dxf.radius
-        start_angle = entity.dxf.start_angle
-        end_angle = entity.dxf.end_angle
-        angle = abs(end_angle - start_angle)
-        if angle > 360:
-            angle = 360
-        arc_length = 2 * math.pi * radius * (angle / 360)
-        min_x = min(min_x, x - radius)
-        max_x = max(max_x, x + radius)
-        min_y = min(min_y, y - radius)
-        max_y = max(max_y, y + radius)
-        if start_angle < end_angle:
-            min_x = min(min_x, x + radius * math.cos(math.radians(start_angle)))
-            max_x = max(max_x, x + radius * math.cos(math.radians(end_angle)))
-            min_y = min(min_y, y + radius * math.sin(math.radians(start_angle)))
-            max_y = max(max_y, y + radius * math.sin(math.radians(end_angle)))
-        else:
-            min_x = min(min_x, x + radius * math.cos(math.radians(end_angle)))
-            max_x = max(max_x, x + radius * math.cos(math.radians(start_angle)))
-            min_y = min(min_y, y + radius * math.sin(math.radians(end_angle)))
-            max_y = max(max_y, y + radius * math.sin(math.radians(start_angle)))
+        start_angle = math.radians(entity.dxf.start_angle)
+        end_angle = math.radians(entity.dxf.end_angle)
+        if start_angle > end_angle:
+            start_angle, end_angle = end_angle, start_angle  # Ensure start is less than end
+
+        # Calculate bounding box for arc
+        angles = [start_angle, end_angle]
+        for angle in [0, math.pi/2, math.pi, 3*math.pi/2]:  # Check cardinal points
+            if start_angle <= angle <= end_angle:
+                angles.append(angle)
+        
+        for angle in angles:
+            test_x = x + radius * math.cos(angle)
+            test_y = y + radius * math.sin(angle)
+            min_x = min(min_x, test_x)
+            max_x = max(max_x, test_x)
+            min_y = min(min_y, test_y)
+            max_y = max(max_y, test_y)
+
     elif entity.dxftype() in ['LINE', 'LWPOLYLINE', 'POLYLINE']:
-        x1, y1, _ = entity.dxf.start
-        x2, y2, _ = entity.dxf.end
-        min_x = min(min_x, x1, x2)
-        max_x = max(max_x, x1, x2)
-        min_y = min(min_y, y1, y2)
-        max_y = max(max_y, y1, y2)
+        points = []
+        if entity.dxftype() == 'LINE':
+            start = entity.dxf.start
+            end = entity.dxf.end
+            if not isinstance(start, tuple):
+                start = tuple(start)
+            if not isinstance(end, tuple):
+                end = tuple(end)
+            points = [start[:2], end[:2]]
+        else:
+            points = entity.get_points(format='xy')
+        
+        for x, y in points:
+            min_x = min(min_x, x)
+            max_x = max(max_x, x)
+            min_y = min(min_y, y)
+            max_y = max(max_y, y)
+
     return min_x, max_x, min_y, max_y
